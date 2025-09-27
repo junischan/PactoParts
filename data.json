@@ -13,7 +13,41 @@
     "sub": "Iluminación avanzada",
     "img": "imagen/20250926_174229.jpg"
   },
-  
+  {
+    "id": 1,
+    "categoria": "accesorios",
+    "titulo": "Componente Premium",
+    "sub": "Última tecnología",
+    "img": "nuevo/imagen/chatgpt-1757012283419.jpg"
+  },
+  {
+    "id": 2,
+    "categoria": "iluminacion",
+    "titulo": "Faro LED Pro",
+    "sub": "Iluminación avanzada",
+    "img": "nuevo/imagen/faro.jpg"
+  },
+  {
+    "id": 3,
+    "categoria": "accesorios",
+    "titulo": "Moldura Ranger 2025",
+    "sub": "Accesorios exterior",
+    "img": "nuevo/imagen/moldguraranger025.jpg"
+  },
+  {
+    "id": 4,
+    "categoria": "motor",
+    "titulo": "Retén Motor 6L",
+    "sub": "Sistema de sellado",
+    "img": "nuevo/imagen/reten6l.jpg"
+  },
+  {
+    "id": 5,
+    "categoria": "suspension",
+    "titulo": "Rótula FS1 Heavy Duty",
+    "sub": "Suspensión reforzada",
+    "img": "nuevo/imagen/rotulafs1.jpg"
+  },
   {
     "id": 1,
     "categoria": "accesorios",
