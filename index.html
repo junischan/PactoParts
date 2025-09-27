@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>#pacto — Catálogo Premium</title>
+  <meta name="description" content="Catálogo con chips automáticos, grid responsive y navegación inferior estilo app." />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#0a0e17; --panel:#0f1526; --card:#141a2a; --bd:#273247; --bd2:#354461;
+      --txt:#e6e8ee; --muted:#98a1b6; --acc:#ffcc00;
+      --gap:12px; --shadow:0 8px 24px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif}
+
+    .appbar{position:sticky;top:0;z-index:40;background:rgba(15,21,38,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+    .row{max-width:1200px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px;color:var(--txt);text-decoration:none;font-weight:900}
+    .dot{width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,var(--acc),#ffd633);box-shadow:0 0 0 4px rgba(255,204,0,.18)}
+
+    .chips-bar{position:sticky;top:48px;z-index:35;background:rgba(15,21,38,.95);border-bottom:1px solid var(--bd);transition:transform .3s ease}
+    .chips{max-width:1200px;margin:0 auto;display:flex;gap:10px;padding:10px 12px;overflow-x:auto;scroll-snap-type:x proximity}
+    .chips::-webkit-scrollbar{display:none}
+    .chip{flex:0 0 auto;scroll-snap-align:start;padding:8px 14px;border-radius:999px;border:1px solid var(--bd);background:#0c1220;color:var(--muted);font-size:13px;font-weight:800;text-transform:capitalize}
+    .chip.active{background:#18213a;color:var(--txt);border-color:var(--bd2)}
+
+    .wrap{max-width:1200px;margin:0 auto;padding:12px}
+    .masonry{column-count:2;column-gap:var(--gap)}
+    @media (min-width:600px){.masonry{column-count:3}}
+    @media (min-width:900px){.masonry{column-count:4}}
+    @media (min-width:1200px){.masonry{column-count:5}}
+
+    .pin{display:inline-block;width:100%;margin:0 0 var(--gap);break-inside:avoid;border-radius:12px;background:var(--card);border:1px solid var(--bd);overflow:hidden;box-shadow:var(--shadow)}
+    .thumb{aspect-ratio:4/3;background:#0d1324}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .meta{padding:10px}
+    .title{margin:0 0 4px;font:800 15px/1.25 system-ui,Segoe UI}
+    .sub{margin:0;color:#a9b1c6;font:600 12px/1.3 system-ui}
+
+    .bottom-nav{position:sticky;bottom:0;z-index:50;background:#0b0f19;border-top:1px solid var(--bd);height:64px;display:flex;justify-content:space-around;align-items:center;padding:0 env(safe-area-inset-left) env(safe-area-inset-bottom) env(safe-area-inset-right);transition:transform .3s ease}
+    .bottom-nav a{flex:1;text-align:center;text-decoration:none;color:#aab2c7;padding:8px 0;display:flex;align-items:center;justify-content:center;font-weight:700;position:relative}
+    .material-icons{font-size:28px;line-height:1}
+    .bottom-nav a.active{color:var(--acc)}
+    .bottom-nav a[data-nav="chat"].has-notif::after{content:"";position:absolute;top:10px;right:32%;width:8px;height:8px;background:#ff3b30;border-radius:999px;box-shadow:0 0 0 2px #0b0f19}
+    main{padding-bottom:76px}
+  </style>
+</head>
+<body>
+  <header class="appbar">
+    <div class="row">
+      <a href="#" class="brand"><span class="dot"></span><span>#pacto catálogo</span></a>
+    </div>
+  </header>
+
+  <div class="chips-bar" id="chipsBar">
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <main class="wrap">
+    <section class="masonry" id="grid"></section>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <a href="#" class="active" data-nav="home"><span class="material-icons">home</span></a>
+    <a href="#" data-nav="buscar"><span class="material-icons">search</span></a>
+    <a href="#" data-nav="crear"><span class="material-icons">add_circle</span></a>
+    <a href="#" data-nav="chat"><span class="material-icons">chat</span></a>
+    <a href="#" data-nav="perfil"><span class="material-icons">person</span></a>
+  </nav>
+
+  <script>
+    const LABEL = {
+      todos:'Para ti', motor:'Motor', suspension:'Suspensión',
+      iluminacion:'Luces', accesorios:'Exterior',
+      frenos:'Frenos', electrico:'Eléctrico'
+    };
+
+    let PRODUCTS = [];
+
+    async function loadProducts(){
+      try {
+        const res = await fetch('data.json');
+        PRODUCTS = await res.json();
+      } catch(e){
+        console.error("Error cargando data.json", e);
+        PRODUCTS = [];
+      }
+      selectCategory(localStorage.getItem('pacto_cat') || 'todos');
+    }
+
+    const chipsBar = document.getElementById('chipsBar');
+    const chipsEl  = document.getElementById('chips');
+    const gridEl   = document.getElementById('grid');
+
+    function uniqueCategories(items){
+      const cats = Array.from(new Set(items.map(p => p.categoria))).filter(Boolean);
+      cats.sort();
+      return ['todos', ...cats];
+    }
+
+    function renderChips(cats, current){
+      chipsEl.innerHTML = '';
+      cats.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (cat === current ? ' active' : '');
+        btn.dataset.cat = cat;
+        btn.textContent = LABEL[cat] || cat;
+        btn.addEventListener('click', () => selectCategory(cat));
+        chipsEl.appendChild(btn);
+      });
+    }
+
+    function renderGrid(items){
+      gridEl.innerHTML = items.map(p => `
+        <article class="pin" data-cat="${p.categoria}">
+          <div class="thumb"><img src="${p.img}" alt="${p.titulo}" loading="lazy" /></div>
+          <div class="meta"><p class="title">${p.titulo}</p><p class="sub">${p.sub || ''}</p></div>
+        </article>
+      `).join('');
+    }
+
+    function selectCategory(cat){
+      const cats = uniqueCategories(PRODUCTS);
+      if (!cats.includes(cat)) cat = 'todos';
+      renderChips(cats, cat);
+      const filtered = (cat === 'todos') ? PRODUCTS : PRODUCTS.filter(p => p.categoria === cat);
+      renderGrid(filtered);
+      try { localStorage.setItem('pacto_cat', cat); } catch {}
+    }
+
+    (function(){
+      const bottomNav = document.getElementById('bottomNav');
+      let lastY = 0;
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY || document.documentElement.scrollTop;
+        const down = y > lastY;
+        if (y > 80){
+          chipsBar.style.transform  = down ? 'translateY(-100%)' : 'translateY(0)';
+          bottomNav.style.transform = down ? 'translateY(100%)'  : 'translateY(0)';
+        } else {
+          chipsBar.style.transform = 'translateY(0)';
+          bottomNav.style.transform = 'translateY(0)';
+        }
+        lastY = y;
+      }, { passive:true });
+    })();
+
+    (function(){
+      const chatLink = document.querySelector('.bottom-nav a[data-nav="chat"]');
+      chatLink.classList.add('has-notif'); // quita si no hay notificaciones
+    })();
+
+    (function(){
+      const navs = document.querySelectorAll('.bottom-nav a');
+      navs.forEach(n => n.addEventListener('click', e => {
+        e.preventDefault();
+        navs.forEach(x => x.classList.remove('active'));
+        n.classList.add('active');
+      }));
+    })();
+
+    loadProducts();
+  </script>
+</body>
+  </html>
