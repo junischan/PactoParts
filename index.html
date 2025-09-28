@@ -3,13 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PactoParts — Catálogo Premium</title>
-  <!-- Logo en pestaña -->
-<link rel="icon" href="favicon.ico" type="image/x-icon">
-
-<!-- Logo en PNG para compatibilidad -->
-<link rel="icon" href="file_00000000686c61f59e3a06b67567dfd5.png" type="image/png">
-  <meta name="description" content="Catálogo con chips automáticos, masonry responsive y navegación inferior estilo app." />
+  <title>PactoParts — Catálogo</title>
+  <meta name="description" content="Catálogo con categorías automáticas, buscador en vivo, modal de detalle y navegación estilo app." />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style>
     :root{
@@ -18,133 +13,87 @@
       --gap:12px; --shadow:0 8px 24px rgba(0,0,0,.45);
     }
     *{box-sizing:border-box}
-    html,body{
-      margin:0; background:var(--bg); color:var(--txt);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif
-    }
+    html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif}
 
     /* Header */
-    .appbar{
-      position:sticky; top:0; z-index:40;
-      background:rgba(15,21,38,.95); backdrop-filter:blur(14px);
-      border-bottom:1px solid var(--bd)
-    }
+    .appbar{position:sticky;top:0;z-index:40;background:rgba(15,21,38,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
     .row{max-width:1400px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
     .brand{display:flex;align-items:center;gap:10px;color:var(--txt);text-decoration:none;font-weight:900}
-    .dot{
-      width:26px;height:26px;border-radius:9px;
-      background:linear-gradient(135deg,var(--acc),#ffd633);
-      box-shadow:0 0 0 4px rgba(255,204,0,.18)
-    }
+    .brand img{height:28px;display:block}
+
+    /* Searchbar */
+    .searchbar{position:sticky;top:48px;z-index:36;background:rgba(15,21,38,.95);border-bottom:1px solid var(--bd);padding:10px 16px;backdrop-filter:blur(12px)}
+    .searchbar input{width:100%;border:1px solid var(--bd);background:#0c1220;color:var(--txt);border-radius:999px;padding:10px 14px;font-weight:700;letter-spacing:.2px}
 
     /* Chips */
-    .chips-bar{
-      position:sticky; top:48px; z-index:35;
-      background:rgba(15,21,38,.95); border-bottom:1px solid var(--bd);
-      transition:transform .3s ease
-    }
-    .chips{
-      max-width:1400px; margin:0 auto; display:flex; gap:10px;
-      padding:10px 16px; overflow-x:auto; scroll-snap-type:x proximity
-    }
+    .chips-bar{position:sticky;top:96px;z-index:35;background:rgba(15,21,38,.95);border-bottom:1px solid var(--bd);transition:transform .3s ease}
+    .chips{max-width:1400px;margin:0 auto;display:flex;gap:10px;padding:10px 16px;overflow-x:auto;scroll-snap-type:x proximity}
     .chips::-webkit-scrollbar{display:none}
-    .chip{
-      flex:0 0 auto; scroll-snap-align:start;
-      padding:8px 14px; border-radius:999px;
-      border:1px solid var(--bd); background:#0c1220; color:var(--muted);
-      font-size:13px; font-weight:800; text-transform:capitalize;
-      transition:background .2s ease,border-color .2s ease
-    }
+    .chip{flex:0 0 auto;scroll-snap-align:start;padding:8px 14px;border-radius:999px;border:1px solid var(--bd);background:#0c1220;color:var(--muted);font-size:13px;font-weight:800;text-transform:capitalize;transition:background .2s ease,border-color .2s ease}
     .chip.active{background:#18213a;color:var(--txt);border-color:var(--bd2)}
 
-    /* Contenedor + Masonry real (CSS columns) */
+    /* Contenedor + Masonry (alturas desiguales) */
     .wrap{max-width:1400px;margin:0 auto;padding:20px 16px}
-    .masonry{
-      column-count:2; column-gap:var(--gap);
-    }
+    .masonry{column-count:2;column-gap:var(--gap)}
     @media (min-width:600px){ .masonry{ column-count:3 } }
     @media (min-width:900px){ .masonry{ column-count:4 } }
     @media (min-width:1400px){ .masonry{ column-count:5 } }
 
     /* Cards */
-    .pin{
-      display:inline-block; width:100%; margin:0 0 var(--gap); break-inside:avoid;
-      border-radius:12px; background:var(--card); border:1px solid var(--bd);
-      overflow:hidden; box-shadow:var(--shadow);
-      transition:transform .2s ease, box-shadow .2s ease
-    }
-    @media (hover:hover){
-      .pin:hover{ transform:translateY(-4px); box-shadow:0 14px 30px rgba(0,0,0,.45) }
-    }
-
-    /* Imágenes desiguales (altura natural) */
-    .thumb{ background:#0d1324 }
-    .thumb img{
-      width:100%;
-      height:auto;   /* clave para alturas variadas */
-      display:block;
-    }
-
+    .pin{display:inline-block;width:100%;margin:0 0 var(--gap);break-inside:avoid;border-radius:12px;background:var(--card);border:1px solid var(--bd);overflow:hidden;box-shadow:var(--shadow);transition:transform .2s ease, box-shadow .2s ease;cursor:pointer}
+    @media (hover:hover){ .pin:hover{ transform:translateY(-4px); box-shadow:0 14px 30px rgba(0,0,0,.45) } }
+    .thumb{background:#0d1324}
+    .thumb img{width:100%;height:auto;display:block}
     .meta{padding:10px}
-    .title{margin:0 0 4px; font:800 15px/1.25 system-ui,Segoe UI}
-    .sub{margin:0; color:#a9b1c6; font:600 12px/1.3 system-ui}
-    @media (min-width:1024px){
-      .title{font-size:16px}
-      .sub{font-size:13px}
-    }
+    .title{margin:0 0 4px;font:800 15px/1.25 system-ui,Segoe UI}
+    .sub{margin:0;color:#a9b1c6;font:600 12px/1.3 system-ui}
+    @media (min-width:1024px){ .title{font-size:16px} .sub{font-size:13px} }
 
-    /* Bottom nav (Material Icons) */
-    .bottom-nav{
-      position:sticky; bottom:0; z-index:50;
-      background:#0b0f19; border-top:1px solid var(--bd);
-      height:64px; display:flex; justify-content:space-around; align-items:center;
-      padding:0 env(safe-area-inset-left) env(safe-area-inset-bottom) env(safe-area-inset-right);
-      transition:transform .3s ease;
-    }
-    .bottom-nav a{
-      flex:1; text-align:center; text-decoration:none; color:#aab2c7;
-      padding:8px 0; display:flex; align-items:center; justify-content:center;
-      font-weight:700; position:relative
-    }
-    .material-icons{font-size:28px; line-height:1}
+    /* Bottom nav (solo mobile) */
+    .bottom-nav{position:sticky;bottom:0;z-index:50;background:#0b0f19;border-top:1px solid var(--bd);height:64px;display:flex;justify-content:space-around;align-items:center;padding:0 env(safe-area-inset-left) env(safe-area-inset-bottom) env(safe-area-inset-right);transition:transform .3s ease}
+    .bottom-nav a{flex:1;text-align:center;text-decoration:none;color:#aab2c7;padding:8px 0;display:flex;align-items:center;justify-content:center;font-weight:700;position:relative}
+    .material-icons{font-size:28px;line-height:1}
     .bottom-nav a.active{color:var(--acc)}
-    .bottom-nav a[data-nav="chat"].has-notif::after{
-      content:""; position:absolute; top:10px; right:32%;
-      width:8px; height:8px; background:#ff3b30; border-radius:999px;
-      box-shadow:0 0 0 2px #0b0f19
-    }
-
-    /* Desktop: mantener barras visibles y ocultar bottom-nav tipo app */
-    @media (min-width:1024px){
-      .chips-bar{ transform:none !important; }
-      .bottom-nav{ display:none; }
-      main{ padding-bottom:24px; }
-    }
+    .bottom-nav a[data-nav="chat"].has-notif::after{content:"";position:absolute;top:10px;right:32%;width:8px;height:8px;background:#ff3b30;border-radius:999px;box-shadow:0 0 0 2px #0b0f19}
+    @media (min-width:1024px){ .bottom-nav{display:none} main{padding-bottom:24px} }
 
     main{padding-bottom:76px}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;display:grid;place-items:center;z-index:100}
+    .modal[hidden]{display:none}
+    .modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
+    .modal__card{position:relative;background:var(--card);border:1px solid var(--bd);border-radius:14px;max-width:720px;width:min(92vw,720px);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+    .modal__close{position:absolute;right:8px;top:8px;font-size:22px;background:transparent;color:var(--txt);border:0;cursor:pointer}
+    .modal__media img{width:100%;height:auto;display:block;background:#0d1324}
+    .modal__info{padding:14px}
+    .modal__info h3{margin:0 0 6px}
+    .modal__info .muted{color:#a9b1c6;margin:0 0 12px}
+    .modal__actions .cta{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid var(--bd);background:#0c1220;color:var(--txt);text-decoration:none;font-weight:800}
+    .modal__actions .cta:hover{border-color:var(--bd2)}
   </style>
 </head>
 <body>
   <header class="appbar">
-  <div class="row">
-    <a href="#" class="brand">
-      <img src="file_00000000686c61f59e3a06b67567dfd5.png" 
-           alt="PactoParts Logo" style="height:28px;">
-      <span>PactoParts</span>
-    </a>
-  </div>
+    <div class="row">
+      <a href="#" class="brand">
+        <!-- Poné tu logo si querés -->
+        <!-- <img src="file_00000000686c61f59e3a06b67567dfd5.png" alt="PactoParts Logo"> -->
+        <span>PactoParts</span>
+      </a>
+    </div>
   </header>
 
-  <!-- Chips (se generan solos) -->
-  <div class="chips-bar" id="chipsBar">
-    <div class="chips" id="chips"></div>
-  </div>
+  <!-- Buscador -->
+  <div class="searchbar"><input id="q" type="search" placeholder="Buscar repuestos (ej: faro, ranger, motor)…" /></div>
 
-  <main class="wrap">
-    <section class="masonry" id="grid"></section>
-  </main>
+  <!-- Chips (auto) -->
+  <div class="chips-bar" id="chipsBar"><div class="chips" id="chips"></div></div>
 
-  <!-- Bottom Nav (solo mobile) -->
+  <!-- Grid -->
+  <main class="wrap"><section class="masonry" id="grid"></section></main>
+
+  <!-- Bottom Nav (mobile) -->
   <nav class="bottom-nav" id="bottomNav">
     <a href="#" class="active" data-nav="home" aria-label="Inicio"><span class="material-icons">home</span></a>
     <a href="#" data-nav="buscar" aria-label="Buscar"><span class="material-icons">search</span></a>
@@ -153,24 +102,35 @@
     <a href="#" data-nav="perfil" aria-label="Perfil"><span class="material-icons">person</span></a>
   </nav>
 
-  <script>
-    const LABEL = {
-      todos:'Para ti', motor:'Motor', suspension:'Suspensión',
-      iluminacion:'Luces', accesorios:'Exterior',
-      frenos:'Frenos', electrico:'Eléctrico'
-    };
+  <!-- Modal -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__card">
+      <button class="modal__close" data-close>&times;</button>
+      <div class="modal__media"><img id="mImg" alt=""></div>
+      <div class="modal__info">
+        <h3 id="mTitle"></h3>
+        <p id="mSub" class="muted"></p>
+        <div class="modal__actions">
+          <a id="mWsp" target="_blank" rel="noopener" class="cta">💬 Consultar por WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    const LABEL = {todos:'Para ti', motor:'Motor', suspension:'Suspensión', iluminacion:'Luces', accesorios:'Exterior', frenos:'Frenos', electrico:'Eléctrico'};
     let PRODUCTS = [];
 
     async function loadProducts(){
-      try {
-        const res = await fetch('data.json', { cache: 'no-cache' });
+      try{
+        const res = await fetch('data.json',{cache:'no-cache'});
         PRODUCTS = await res.json();
-      } catch(e){
-        console.error("Error cargando data.json", e);
+      }catch(e){
+        console.error('Error cargando data.json', e);
         PRODUCTS = [];
       }
-      selectCategory(localStorage.getItem('pacto_cat') || 'todos');
+      selectCategory(localStorage.getItem('pacto_cat') || 'todos'); // inicial
     }
 
     const chipsBar = document.getElementById('chipsBar');
@@ -197,23 +157,42 @@
 
     function renderGrid(items){
       gridEl.innerHTML = items.map(p => `
-        <article class="pin" data-cat="${p.categoria}">
-          <div class="thumb"><img src="${p.img}" alt="${p.titulo}" loading="lazy" /></div>
-          <div class="meta"><p class="title">${p.titulo}</p><p class="sub">${p.sub || ''}</p></div>
+        <article class="pin" data-cat="${p.categoria}" data-id="${p.id||''}">
+          <div class="thumb"><img src="${p.img}" alt="${p.titulo||''}" loading="lazy"
+            onerror="this.onerror=null;this.src='https://via.placeholder.com/800x600?text=Imagen+no+disponible';"></div>
+          <div class="meta"><p class="title">${p.titulo||''}</p><p class="sub">${p.sub||''}</p></div>
         </article>
       `).join('');
+
+      // abrir modal al click
+      gridEl.querySelectorAll('.pin').forEach(card=>{
+        card.addEventListener('click', ()=>{
+          const id = String(card.dataset.id||'');
+          const p = PRODUCTS.find(x=> String(x.id||'')===id) || PRODUCTS[0];
+          openModal(p);
+        });
+      });
     }
 
     function selectCategory(cat){
       const cats = uniqueCategories(PRODUCTS);
       if (!cats.includes(cat)) cat = 'todos';
       renderChips(cats, cat);
-      const filtered = (cat === 'todos') ? PRODUCTS : PRODUCTS.filter(p => p.categoria === cat);
+      const term = (document.getElementById('q').value || '').toLowerCase().trim();
+      const base = (cat==='todos') ? PRODUCTS : PRODUCTS.filter(p=>p.categoria===cat);
+      const filtered = term ? base.filter(p =>
+        (p.titulo||'').toLowerCase().includes(term) ||
+        (p.sub||'').toLowerCase().includes(term) ||
+        (p.categoria||'').toLowerCase().includes(term)
+      ) : base;
       renderGrid(filtered);
-      try { localStorage.setItem('pacto_cat', cat); } catch {}
+      try{ localStorage.setItem('pacto_cat', cat); }catch{}
     }
 
-    // Auto-ocultar superior/inferior SOLO en móvil
+    // buscador en vivo
+    document.getElementById('q').addEventListener('input', ()=> selectCategory(localStorage.getItem('pacto_cat')||'todos'));
+
+    // auto-ocultar barras SOLO en móvil
     (function(){
       const mq = window.matchMedia('(max-width: 1023px)');
       const bottomNav = document.getElementById('bottomNav');
@@ -246,35 +225,34 @@
           unbind(); unbind = null;
         }
       }
-
       mq.addEventListener ? mq.addEventListener('change', apply) : mq.addListener(apply);
       apply();
     })();
 
-    // Notificación en chat (on/off)
-    (function(){
-      const chatLink = document.querySelector('.bottom-nav a[data-nav="chat"]');
-      chatLink.classList.add('has-notif'); // quitar si no hay notificaciones
-    })();
+    // notif en chat (demo)
+    document.querySelector('.bottom-nav a[data-nav="chat"]').classList.add('has-notif');
 
-    // Estado activo del bottom-nav
-    (function(){
-      const navs = document.querySelectorAll('.bottom-nav a');
-      navs.forEach(n => n.addEventListener('click', e => {
-        e.preventDefault();
-        navs.forEach(x => x.classList.remove('active'));
-        n.classList.add('active');
-      }));
-    })();
+    // estado activo bottom-nav
+    document.querySelectorAll('.bottom-nav a').forEach(n=> n.addEventListener('click', e=>{
+      e.preventDefault(); document.querySelectorAll('.bottom-nav a').forEach(x=>x.classList.remove('active')); n.classList.add('active');
+    }));
 
-    // Carga inicial
+    // modal
+    function openModal(p){
+      const m = document.getElementById('modal');
+      const img = document.getElementById('mImg');
+      img.src = p.img || '';
+      img.onerror = function(){ this.onerror=null; this.src='https://via.placeholder.com/1024x768?text=Imagen+no+disponible'; };
+      document.getElementById('mTitle').textContent = p.titulo || 'Producto';
+      document.getElementById('mSub').textContent   = p.sub || '';
+      const msg = encodeURIComponent(`Hola! Me interesa este producto:\n${p.titulo||''} (${p.categoria||''})\n${location.href}`);
+      document.getElementById('mWsp').href = `https://wa.me/595000000000?text=${msg}`; // ← tu número
+      m.hidden = false;
+    }
+    document.addEventListener('click', e=>{ if(e.target.matches('[data-close]')) document.getElementById('modal').hidden = true; });
+
+    // init
     loadProducts();
-
-    // API pública simple por si necesitás manipular en runtime
-    window.Pacto = {
-      addProduct(p){ PRODUCTS.push(p); selectCategory(localStorage.getItem('pacto_cat') || 'todos'); },
-      setProducts(list){ PRODUCTS.splice(0, PRODUCTS.length, ...list); selectCategory('todos'); }
-    };
   </script>
 </body>
 </html>
